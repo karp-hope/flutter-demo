@@ -6,6 +6,8 @@ buildscript {
 
     dependencies {
         classpath 'com.android.tools.build:gradle:3.2.1'
+
+        classpath fileTree(dir: 'tingyunplugin', include: ['*.jar'])
     }
 }
 
