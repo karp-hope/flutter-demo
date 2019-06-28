@@ -2,12 +2,36 @@ import 'package:flutter/material.dart';
 import 'package:flutter_ty_demo/tabs/block.dart';
 import 'package:flutter_ty_demo/tabs/network.dart';
 import 'package:flutter_ty_demo/tabs/webview.dart';
+import 'package:flutter_ty_demo/utils/provider.dart';
+import 'package:flutter_ty_demo/utils/shared_preferences.dart';
+import 'package:flutter/services.dart';
 
-void main() {
+import 'dart:io' show Platform;
+import 'package:http/http.dart' as http;
+
+SpUtil sp;
+var db;
+
+void main() async {
+  final provider = Provider();
+  await provider.init();
+
+  sp = await SpUtil.getInstance();
+  db = Provider.db;
+
   runApp(new MaterialApp(
     title: "tingyun demo",
     home: new TingYunHome(),
   ));
+
+  if (Platform.isAndroid) {
+    // 以下两行 设置android状态栏为透明的沉浸。写在组件渲染之后，
+    // 是为了在渲染后进行set赋值，覆盖状态栏，写在渲染之前MaterialApp组件会覆盖掉这个值。
+    //设置相关状态栏的状况
+    SystemUiOverlayStyle systemUiOverlayStyle =
+        SystemUiOverlayStyle(statusBarColor: Colors.transparent);
+    SystemChrome.setSystemUIOverlayStyle(systemUiOverlayStyle);
+  }
 }
 
 class TingYunHome extends StatefulWidget {
@@ -76,8 +100,8 @@ class MyHomeState extends State<TingYunHome>
         // Set the bottom property of the Appbar to include a Tab Bar
         bottom: getTabBar(),
       ),
-
-      body: getTabBarView(<Widget>[new Network(), new Block(), new WebViewTy()]),
+      body:
+          getTabBarView(<Widget>[new Network(), new Block(), new WebViewTy()]),
     );
   }
 }
