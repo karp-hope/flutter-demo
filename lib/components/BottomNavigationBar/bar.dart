@@ -14,6 +14,8 @@ class _BarState extends State<Bar> {
   PageController _pageController;
   int _currentIndex = 0;
 
+  List<Widget> pages;
+
   @override
   void initState() {
     // TODO: implement initState
@@ -35,7 +37,59 @@ class _BarState extends State<Bar> {
     return new WillPopScope(
         child: Scaffold(
 //          挡在第四个界面的时候（"我"的界面的时候，没有顶部的appBar的内容，所以此时去掉）
-          appBar: _currentIndex != 3 ? defaultAppBar : null,),
+          appBar: _currentIndex != 3 ? defaultAppBar : null,
+//          body: PageView.builder(
+//            itemBuilder: (BuildContext context, int index) {
+//              return pages[index];
+//            },
+//            controller: _pageController,
+//            itemCount: pages.length,
+//            onPageChanged: (int index) {
+//              setState(() {
+//                _currentIndex = index;
+//                if(index == 3){
+//
+//                }
+//              });
+//            },
+//          ),
+
+          bottomNavigationBar: BottomNavigationBar(
+              type: BottomNavigationBarType.fixed,
+              iconSize: 24.0,
+              currentIndex: _currentIndex,
+              onTap: (int index){
+                ///setState在mounted为true的时候才可以调用
+                if(mounted){
+                  setState(() {
+                    _currentIndex = index;
+
+                  });
+                }
+              },
+              // 点击里面的按钮的回调函数，参数为当前点击的按钮 index
+              selectedItemColor: Colors.green,
+//              fixedColor: Colors.red,
+              items: const <BottomNavigationBarItem>[
+                BottomNavigationBarItem(
+                    icon: Icon(ICons.HOME),
+                    activeIcon: Icon(ICons.HOME_CHECKED),
+                    title: Text('微信')
+                    ),
+                BottomNavigationBarItem(
+                    title: Text("通讯录"),
+                    icon: Icon(ICons.ADDRESS_BOOK),
+                    activeIcon: Icon(ICons.ADDRESS_BOOK_CHECKED)),
+                BottomNavigationBarItem(
+                    title: Text("发现"),
+                    icon: Icon(ICons.FOUND),
+                    activeIcon: Icon(ICons.FOUND_CHECKED)),
+                BottomNavigationBarItem(
+                    title: Text("我"),
+                    icon: Icon(ICons.WO),
+                    activeIcon: Icon(ICons.WO_CHECKED)),
+              ]),
+        ),
         onWillPop: () {
           return _dialogExitApp(context);
         });
