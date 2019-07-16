@@ -28,10 +28,13 @@ dependencies:
   sqflite: ^1.1.6
   # 本地存储、收藏功能
   shared_preferences: ^0.5.1
+  # 用来更好的处理Routes和navigator
+  fluro: "^1.5.0"
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  mockito: ^4.1.0
 
 
 # For information on the generic Dart part of this file, see the
@@ -77,3 +80,9 @@ flutter:
   # see https://flutter.dev/custom-fonts/#from-packages
   assets:
     - static/app.db
+
+  # 下面的font带上了图标了
+  fonts:
+    - family: wxIconFont
+      fonts:
+        - asset: static/font/iconfont.ttf
