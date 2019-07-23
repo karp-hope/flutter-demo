@@ -1,7 +1,10 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_ty_demo/common/event/ThemeChangeEvent.dart';
 import 'package:flutter_ty_demo/common/style/Style.dart';
+import 'package:event_bus/event_bus.dart';
+
 
 class Bar extends StatefulWidget{
   @override
@@ -13,20 +16,44 @@ class _BarState extends State<Bar> {
 
   PageController _pageController;
   int _currentIndex = 0;
+  static String appBarTitle = tabData[0]['text'];
 
-  List<Widget> pages;
+  static List tabData = [
+    {'text':'微信', 'icon': new Icon(ICons.HOME)},
+    {'text': '通讯录', 'icon': new Icon(ICons.ADDRESS_BOOK)},
+    {'text': '发现', 'icon': new Icon(ICons.FOUND)},
+    {'text': '我', 'icon': new Icon(ICons.WO)}
+    ];
+
+  List<Widget> pages = [];
+  StreamSubscription subscription;
+  static Color themeDef = Color(0xffEDEDED);
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState(); //开始的时候调用
     _pageController = PageController(initialPage: _currentIndex);
+    //如果eventBus的on后面没有跟类型的话，就是监听所有的类型
+    subscription = ThemeChangeHandler.eventBus.on<ThemeChangeEvent>().
+    listen((ThemeChangeEvent onData) {
+      print('监听改变主题事件=========');
+      this.changeTheme(onData);
+    });
+  }
+
+  void changeTheme(ThemeChangeEvent data){
+    setState(() {
+      print(data);
+      themeDef = Color(data.color);
+    });
   }
 
   @override
   void dispose() {
     // TODO: implement dispose
     _pageController.dispose();
+    subscription.cancel();
     super.dispose(); //end的时候调用，进去super里面可以看见详细api的说明
   }
 
@@ -38,21 +65,24 @@ class _BarState extends State<Bar> {
         child: Scaffold(
 //          挡在第四个界面的时候（"我"的界面的时候，没有顶部的appBar的内容，所以此时去掉）
           appBar: _currentIndex != 3 ? defaultAppBar : null,
-//          body: PageView.builder(
-//            itemBuilder: (BuildContext context, int index) {
-//              return pages[index];
-//            },
-//            controller: _pageController,
-//            itemCount: pages.length,
-//            onPageChanged: (int index) {
-//              setState(() {
-//                _currentIndex = index;
-//                if(index == 3){
-//
-//                }
-//              });
-//            },
-//          ),
+          body: PageView.builder(
+            itemBuilder: (BuildContext context, int index) {
+              return pages[index];
+            },
+            controller: _pageController,
+            itemCount: pages.length,
+            onPageChanged: (int index) {
+              setState(() {
+                appBarTitle = tabData[index]['text'];
+                _currentIndex = index;
+                if(index == 3){
+                  ThemeChangeHandler.themeChangeHandler(0xffFFFFFF);
+                }else{
+                  ThemeChangeHandler.themeChangeHandler(0xffEDEDED);
+                }
+              });
+            },
+          ),
 
           bottomNavigationBar: BottomNavigationBar(
               type: BottomNavigationBarType.fixed,
@@ -63,7 +93,9 @@ class _BarState extends State<Bar> {
                 if(mounted){
                   setState(() {
                     _currentIndex = index;
-
+                    appBarTitle = tabData[index]['text'];
+                    ///curves定义了一种动画进入退出的方式bounceIN
+                    _pageController.animateToPage(index, duration: Duration(milliseconds: 1), curve: Curves.bounceIn);
                   });
                 }
               },
@@ -96,7 +128,8 @@ class _BarState extends State<Bar> {
   }
 
   Widget defaultAppBar = AppBar(
-    title: const Text('微信'),
+    backgroundColor: themeDef,
+    title: Text(appBarTitle),
     /// The z-coordinate at which to place this app bar relative to its parent.
     /// 相当于是否整体的提高了，这样有阴影的效果
     elevation: 0.0,
