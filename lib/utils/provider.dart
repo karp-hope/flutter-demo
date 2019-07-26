@@ -40,11 +40,10 @@ class Provider {
   }
 
   //初始化数据库
-  Future init({PathManager pathManager, bool isCreate}) async {
-
-
-    String path = await pathManager.getDbPath();
-    print('path: $path');
+  Future init(bool isCreate) async {
+    String databasesPath = await getDatabasesPath();
+    String path = join(databasesPath, 'flutter.db');
+    print(path);
     try {
       db = await openDatabase(path);
     } on Exception catch (e) {

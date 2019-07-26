@@ -43,7 +43,7 @@ class ConversationControlModel{
 
   Sql sql;
 
-  ConversationModel(){
+  ConversationControlModel(){
     sql = Sql.setTable(table);
   }
 

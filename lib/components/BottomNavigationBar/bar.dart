@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_ty_demo/common/event/ThemeChangeEvent.dart';
 import 'package:flutter_ty_demo/common/style/Style.dart';
 import 'package:event_bus/event_bus.dart';
+import 'package:flutter_ty_demo/views/home_page.dart';
 
 
 class Bar extends StatefulWidget{
@@ -25,7 +26,7 @@ class _BarState extends State<Bar> {
     {'text': '我', 'icon': new Icon(ICons.WO)}
     ];
 
-  List<Widget> pages = [];
+  List<Widget> pages = [HomePage()];
   StreamSubscription subscription;
   static Color themeDef = Color(0xffEDEDED);
 

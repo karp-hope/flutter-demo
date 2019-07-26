@@ -16,11 +16,11 @@ SpUtil sp;
 var db;
 
 void main() async {
-//  final provider = Provider();
-//  await provider.init();
-//
-//  sp = await SpUtil.getInstance();
-//  db = Provider.db;
+  final provider = Provider();
+  await provider.init(true);
+
+  sp = await SpUtil.getInstance();
+  db = Provider.db;
 
   runApp(MyApp());
 

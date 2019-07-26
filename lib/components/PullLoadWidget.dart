@@ -1,5 +1,6 @@
 
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 //通用下上刷新控件
 class PullLoadWidget extends StatefulWidget{
@@ -77,10 +78,126 @@ class _PullLoadWidgetState extends State<PullLoadWidget>{
     }
   }
 
+  ///根据配置状态返回实际列表渲染Item
+  _getItem(int index) {
+    if (!control.needHeader &&
+        index == control.dataList.length &&
+        control.dataList.length != 0) {
+      ///如果不需要头部，并且数据不为0，当index等于数据长度时，渲染加载更多Item（因为index是从0开始）
+      return _buildProgressIndicator();
+    } else if (control.needHeader &&
+        index == _getListCount() - 1 &&
+        control.dataList.length != 0) {
+      ///如果需要头部，并且数据不为0，当index等于实际渲染长度 - 1时，渲染加载更多Item（因为index是从0开始）
+      return _buildProgressIndicator();
+    } else if (!control.needHeader && control.dataList.length == 0) {
+      ///如果不需要头部，并且数据为0，渲染空页面
+      return _buildEmpty();
+    } else {
+      ///回调外部正常渲染Item，如果这里有需要，可以直接返回相对位置的index
+      return itemBuilder(context, index);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    // TODO: implement build
-    return null;
+    return new RefreshIndicator(
+
+      ///GlobalKey，用户外部获取RefreshIndicator的State，做显示刷新
+      key: refreshKey,
+
+      ///下拉刷新触发，返回的是一个Future
+      onRefresh: onRefresh,
+      child: new ListView.builder(
+
+        ///保持ListView任何情况都能滚动，解决在RefreshIndicator的兼容问题。
+        physics: const AlwaysScrollableScrollPhysics(),
+
+        ///根据状态返回子孔健
+        itemBuilder: (context, index) {
+          return _getItem(index);
+        },
+
+        ///根据状态返回数量
+        itemCount: _getListCount(),
+
+        ///滑动监听
+        controller: _scrollController,
+      ),
+    );
+  }
+
+  ///空页面
+  Widget _buildEmpty() {
+    return new Container(
+      height: MediaQuery
+          .of(context)
+          .size
+          .height - 100,
+      child: new Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          FlatButton(
+            onPressed: () {},
+            child: new Image(
+                image: new AssetImage('static/images/default_img.png'),
+                width: 70.0,
+                height: 70.0),
+          ),
+          Container(
+            child: Text('暂无数据', style: TextStyle(color: Color(0xFF121917))),
+          ),
+        ],
+      ),
+    );
+  }
+
+  ///上拉加载更多
+  Widget _buildProgressIndicator() {
+    ///是否需要显示上拉加载更多的loading
+    Widget bottomWidget = (control.needLoadMore)
+        ? new Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+
+          ///loading框
+          new SpinKitRotatingCircle(
+            color: Theme
+                .of(context)
+                .primaryColor,
+            size: 25.0,
+          ),
+          new Container(
+            width: 5.0,
+          ),
+
+          ///加载中文本
+          new Text(
+            '正在加载中',
+            style: TextStyle(
+              color: Color(0xFF121917),
+              fontSize: 14.0,
+              fontWeight: FontWeight.bold,
+            ),
+          )
+        ])
+
+    /// 不需要加载
+        : new Container(
+      child: new Text(
+        '已经到底了',
+        style: TextStyle(
+          color: Colors.grey,
+          fontSize: 12.0,
+        ),
+      ),
+    );
+    return new Padding(
+      padding: const EdgeInsets.all(20.0),
+      child: new Center(
+        child: bottomWidget,
+      ),
+    );
   }
 }
 
